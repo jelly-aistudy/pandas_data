@@ -1,0 +1,260 @@
+import numpy as np
+
+## numpy shape, dimention, data type
+
+list1 = [1, 2, 3]
+array1 = np.array(list1)
+print("array1 : ", array1)
+print("array1 type : ", type(array1)) 
+print("array1 shape : ", array1.shape) # (3,)
+print("array1 dimension : ", array1.ndim) # 1
+print("array1 data type : ", array1.dtype) # int32
+
+array2 = np.array([[1,2,3],
+                  [4,5,6]])
+print("array2 type : ", type(array2))
+print("array2 shape : ", array2.shape) # (2, 3)
+print("array2 dimension : ", array2.ndim) # 2
+
+array3 = np.array([[1,2,3]])
+print("array3 type : ", type(array3))
+print("array3 shape : ", array3.shape) # (1, 3)
+print("array3 dimension : ", array3.ndim) # 2
+
+array4 = np.array([1,2,'test'])
+print("array4 : ", array4) # ['1' '2' 'test']
+print("array4 data type : ", array4.dtype)
+
+array5 = np.array([1,2,3.0])
+print("array5 : ", array5) # [1. 2. 3.]
+print("array5 data type : ", array5.dtype)
+
+## change data type - astype
+
+array_int1 = np.array([1,2,3])
+array_float1 = array_int1.astype('float64')
+print("array_float1 : ", array_float1)
+print("array_float1 data type : ", array_float1.dtype)
+
+array_float2 = np.array([1.1, 2.2, 3.3])
+array_int2 = array_float2.astype('int32')
+print("array_int2 : ", array_int2)
+print("array_int2 data type : ", array_int2.dtype)
+
+## axis = 0 -> row direction, axis = 1 -> column direction
+
+array_sum = np.array([[1,2,3],
+                    [4,5,6]])
+print(array_sum.sum())
+print(array_sum.sum(axis=0))
+print(array_sum.sum(axis=1))
+
+## make ndarray - arange, zeros, ones
+
+sequence_array = np.arange(10)
+print(sequence_array) # [0 1 2 3 4 5 6 7 8 9]
+print(sequence_array.dtype, sequence_array.shape) # int32 (10,)
+
+zero_array = np.zeros((3,2), dtype='int32')
+print(zero_array)
+# [[0 0]
+# [0 0]
+# [0 0]]
+print(zero_array.dtype, zero_array.shape) # int32 (3, 2)
+
+one_array = np.ones((3,2))
+print(one_array)
+# [[1. 1.]
+# [1. 1.]
+# [1. 1.]]
+print(one_array.dtype, one_array.shape) # float64 (3, 2)
+
+## change shape - reshape
+
+array_orig = np.arange(10)
+print("array_orig : ", array_orig) # [0 1 2 3 4 5 6 7 8 9]
+
+array_ch1 = array_orig.reshape(2,5)
+print("array_ch1 : ", array_ch1) 
+# [[0 1 2 3 4]
+#  [5 6 7 8 9]]
+
+array_ch2 = array_orig.reshape(5,2)
+print("array_ch2 : ", array_ch2)
+# [[0 1]
+#  [2 3]
+#  [4 5]
+#  [6 7]
+#  [8 9]]
+
+# shape must be equal to total size
+
+array_var1= array_orig.reshape(-1, 5)
+print("array_var1 : ", array_var1)
+# [[0 1 2 3 4]
+#  [5 6 7 8 9]]
+
+array_var2 = array_orig.reshape(5, -1)
+print("array_var2 : ", array_var2)
+# [[0 1]
+#  [2 3]
+#  [4 5]
+#  [6 7]
+#  [8 9]]
+
+array_1d = np.arange(5)
+array_2d = array_1d.reshape(-1, 1) # 1d to 2d ndarray
+array_1d = array_2d.reshape(-1) # 2d to 1d ndarray
+print("array_2d shape: ", array_2d.shape) # (5, 1)
+print("array_2d: \n", array_2d)
+#  [[0]
+#  [1]
+#  [2]
+#  [3]
+#  [4]]
+
+print("array_1d shape: ", array_1d.shape) # (5,)
+print("array_1d: \n", array_1d) 
+# [0 1 2 3 4]
+
+## indexing
+
+array1 = np.arange(start=1, stop=10)
+print("array1: ", array1) # [1 2 3 4 5 6 7 8 9]
+print("array1[2] value : ", array1[2]) # 3
+print("array1 last index value: ", array1[-1]) # 9
+
+array1[0] = 9
+array1[-1] = 0
+print("array1 : ",array1) # [9 2 3 4 5 6 7 8 0]
+
+array2 = array1.reshape(3,3)
+print("array2: \n", array2)
+#  [[9 2 3]
+#  [4 5 6]
+#  [7 8 0]]
+
+print("array1 first row, first column: ", array2[0][0]) # 9
+print("array1 first row, thrid column: ", array2[0][2]) # 3
+print("array1 third row, first column: ", array2[2][0]) # 7
+
+## slicing
+
+array1 = np.arange(start=1, stop=10)
+array2 = array1[0:3]
+array3 = array1[:5]
+array4 = array1[5:]
+array5 = array1[:]
+print(array1) # [1 2 3 4 5 6 7 8 9]
+print(array2) # [1 2 3]
+print(array3) # [1 2 3 4 5]
+print(array4) # [6 7 8 9]
+print(array5) # [1 2 3 4 5 6 7 8 9]
+
+array2d = array1.reshape(3,3)
+print(array2d[0:2, 0:2])
+# [[1 2]
+#  [4 5]]
+print(array2d[1:3, 0:2])
+# [[4 5]
+#  [7 8]]
+print(array2d[:, 2:3])
+# [[3]
+#  [6]
+#  [9]]
+print(array2d[:2, 1:])
+# [[2 3]
+#  [5 6]]
+print(array2d[1, 2:])
+# [6]
+
+## fancy indexing
+array6 = array2d[[0,1],2]
+print(array6.tolist()) # [3, 6]
+array7 = array2d[[0,2], 0:2]
+print(array7.tolist()) # [[1, 2], [7, 8]]
+array8 = array2d[[0,1]]
+print(array8.tolist()) # [[1, 2, 3], [4, 5, 6]]
+
+## boolean indexing
+array1d = np.arange(start=1, stop=10)
+print(array1d) # [1 2 3 4 5 6 7 8 9]
+print(array1d > 5) # [False False False False False  True  True  True  True]
+print(array1d[array1d > 5]) # [6 7 8 9]
+
+boolean_index = np.array([False, False, False, False, False,  True,  True,  True,  True])
+print(array1d[boolean_index]) # [6 7 8 9]
+
+normal_index = np.array([5,6,7,8])
+print(array1d[normal_index]) # [6 7 8 9]
+
+target = []
+for i in range(0,9):
+    if array1d[i] > 5:
+        target.append(array1d[i])
+print(np.array(target)) # [6 7 8 9]
+
+## sort(), argsort()
+
+array_orig = np.array([3,1,9,5])
+print(array_orig) # [3 1 9 5]
+
+# np.sort()
+array_sorted1 = np.sort(array_orig)
+print(array_sorted1) # [1 3 5 9]
+print(array_orig) # [3 1 9 5]
+
+# ndarray.sort()
+array_sorted2 = array_orig.sort()
+print(array_sorted2) # None
+print(array_orig) # [1 3 5 9]
+
+# asceding False
+array_desc = np.sort(array_orig)[::-1]
+print(array_desc) # [9 5 3 1]
+
+array2d = np.array([[8,4],
+                   [3,12]])
+print(np.sort(array2d, axis=0)) # row direction
+# [[ 3  4]
+#  [ 8 12]]
+print(np.sort(array2d, axis=1)) # column direction
+# [[ 4  8]
+#  [ 3 12]]
+
+array_orig = np.array([3,1,9,5])
+print(np.sort(array_orig)) # [1 3 5 9]
+print(np.sort(array_orig)[::-1]) # [9 5 3 1]
+
+# original array's index after sorted
+sort_indices = np.argsort(array_orig)
+print(sort_indices) # [1 0 3 2]
+sort_indeces_desc = np.argsort(array_orig)[::-1]
+print(sort_indeces_desc) # [2 3 0 1]
+
+# how to use argsort
+name_array=np.array(['Lee', 'Park', 'Kim', 'Cho', 'Song'])
+score_array=np.array([70,100,90,80,30])
+indices = np.argsort(score_array)
+print(indices) # [4 0 3 2 1]
+print(name_array[indices]) # ['Song' 'Lee' 'Cho' 'Kim' 'Park']
+print(score_array[indices]) # [ 30  70  80  90 100]
+
+## dot product
+A = np.array([[1,2,3],
+             [4,5,6]])
+B = np.array([[7,8],
+             [9,10],
+             [11,12]])
+dot_product = np.dot(A,B)
+print(dot_product)
+# [[ 58  64]
+#  [139 154]]
+
+## transpose
+A = np.array([[1,2],
+             [3,4]])
+transpose_mat = np.transpose(A)
+print(transpose_mat)
+# [[1 3]
+#  [2 4]]
