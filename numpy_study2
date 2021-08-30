@@ -1,0 +1,32 @@
+import numpy as np
+
+simple_list = [1,2,3]
+simple_array = np.array(simple_list)
+one_array = np.ones(3)
+result = simple_array + one_array + np.zeros(3)
+print(result) # [2. 3. 4.]
+
+simple_mtx = [[1,2],[3,4]]
+one_mtx = np.ones((2,2))
+identity_mtx = np.eye(2) 
+try:
+  result = simple_mtx + identity_mtx
+  print(result) # [[2.2.][3.5.]]
+except:
+  print("error!")
+
+random_mtx = np.random.random((100,100))
+print(np.linalg.norm(random_mtx))
+print(np.linalg.norm(random_mtx,axis=0))
+print(np.linalg.norm(random_mtx,ord=2)) # ord = 2 for matrix : 2-norm (largest sing. value)
+# for further explanation, https://numpy.org/doc/stable/reference/generated/numpy.linalg.norm.html
+
+random_mtx = np.eye(random_mtx.shape[0]) * random_mtx
+random_mtx += 1 # Broadcasting
+
+mtx1 = np.random.random((8,1,7,1))
+mtx2 = np.random.random((8,2,1,9))
+result1 = mtx1 * mtx2
+result2 = mtx1.dot(mtx2)
+print(np.array_equal(result1, result2), result1.shape, result2.shape)
+# False (8,2,7,9) (8,1,7,8,2,9)
