@@ -1,0 +1,300 @@
+import pandas as pd
+
+titanic_df = pd.read_csv('titanic/train.csv')
+titanic_df.head(5)
+
+## column, index
+print(titanic_df.columns) 
+# 'PassengerId', 'Survived', 'Pclass', 'Name', 'Sex', 'Age', 'SibSp','Parch', 'Ticket', 'Fare', 'Cabin', 'Embarked'
+print(titanic_df.index) # RangeIndex(start=0, stop=891, step=1)
+print(titanic_df.index.values)
+
+## series, dataframe
+series = titanic_df['Name']
+print(series.head(3))
+print(type(series)) # <class 'pandas.core.series.Series'>
+
+multi_df = titanic_df[['Name', 'Age']]
+print(multi_df)
+print(type(multi_df)) # <class 'pandas.core.frame.DataFrame'>
+
+one_df = titanic_df[['Name']]
+print(one_df.head(3))
+print(type(one_df)) # # <class 'pandas.core.frame.DataFrame'>
+
+## shape, info(), describe()
+print(titanic_df.shape) # (891, 12)
+print(titanic_df.info())
+print(titanic_df.describe()) # count, mean, std, min, max, quarter...
+
+## value_counts() - series
+value_counts = titanic_df['Pclass'].value_counts()
+print(value_counts)
+# 3    491
+# 1    216
+# 2    184
+# Name: Pclass, dtype: int64
+
+## sort_values()
+titanic_df.sort_values(by='Pclass', ascending=True)
+titanic_df[['Name','Age']].sort_values(by='Age')
+titanic_df[['Name','Age','Pclass']].sort_values(by=['Pclass','Age'])
+
+## list, dictionary, ndarray <-> DataFrame
+import numpy as np
+
+col_name = ['col1']
+list_temp = [1,2,3]
+array_temp = np.array(list_temp)
+print(array_temp.shape) # (3,)
+
+## list to 1d dataframe
+df_list = pd.DataFrame(list_temp, columns = col_name)
+print(df_list)
+df_array = pd.DataFrame(array_temp, columns = col_name)
+print(df_array)
+
+col_name = ['col1', 'col2', 'col3']
+list_temp = [[1,2,3],
+            [4,5,6]]
+array_temp = np.array(list_temp)
+print(array_temp.shape) # (2, 3)
+
+## list to 2d dataframe
+df_list = pd.DataFrame(list_temp, columns = col_name)
+print(df_list)
+df_array = pd.DataFrame(array_temp, columns = col_name)
+print(df_array)
+
+dic_temp = {'Name': ['Park', 'Lee', 'Kim', 'Choi'],
+           'Year': [2012, 2015, 2020, 2021],
+           'Gender': ['Male', 'Female', 'Male', 'Female']}
+
+# dictionary to dataframe
+temp_df = pd.DataFrame(dic_temp)
+print(temp_df)
+print('-'*30)
+
+# add new column
+temp_df = pd.DataFrame(dic_temp, columns=['Name', 'Year', 'Gender', 'Age'])
+print(temp_df)
+print('-'*30)
+
+# change index
+temp_df = pd.DataFrame(dic_temp, index=['one', 'two', 'three', 'four'])
+print(temp_df)
+print('-'*30)
+
+## dataframe to ndarray
+array_temp = temp_df.values
+print(array_temp)
+print(type(array_temp)) # <class 'numpy.ndarray'>
+
+## dataframe to list, dictionary
+list_temp = temp_df.values.tolist()
+print(list_temp)
+print(type(list_temp)) # <class 'list'>
+
+dict_temp = temp_df.to_dict('list') # return list based on columns
+print(dict_temp)
+print(type(dict_temp)) # <class 'dict'>
+
+## add new column
+titanic_df['Age_0']=0 
+titanic_df['Age_by_10'] = titanic_df['Age']*10
+titanic_df['Family_No'] = titanic_df['SibSp'] + titanic_df['Parch']
+
+## update column
+titanic_df['Family_No'] = titanic_df['Family_No'] + 1
+
+titanic_df.head(3)
+
+## delete column
+titanic_drop_df = titanic_df.drop('Age_0', axis=1) # axis = 1 : drop column
+# titanic_drop_df = titanic_df.drop([0,1,2], axis=0) # axis = 0 : drop row
+titanic_drop_df.head(3)
+
+titanic_df.drop(['Age_0', 'Age_by_10', 'Family_No'], axis=1, inplace=True) # inplace True : update
+titanic_df.head(3)
+
+## index
+titanic_df = pd.read_csv('titanic/train.csv')
+indexes = titanic_df.index
+print(indexes) # RangeIndex(start=0, stop=891, step=1)
+print(indexes.values)
+print(type(indexes.values)) # <class 'numpy.ndarray'>
+print(indexes.values.shape) # (891,)
+print(indexes[:5].values) # [0 1 2 3 4]
+print(indexes.values[:5]) # [0 1 2 3 4]
+print(indexes[6]) # 6
+
+## index is only for identification, not for calculation
+series_fare = titanic_df['Fare']
+series_fare.head(5)
+print(series_fare.max()) # 512.3292
+print(series_fare.sum()) # 28693.9493
+print(sum(series_fare)) # 28693.949299999967
+print((series_fare+5).head(3))
+# 0    12.2500
+# 1    76.2833
+# 2    12.9250
+# Name: Fare, dtype: float64
+
+## reset index
+titanic_reset_df = titanic_df.reset_index(inplace=False)
+print(titanic_reset_df.shape) # (891, 13)
+titanic_reset_df.head(3)
+
+value_counts = titanic_df['Pclass'].value_counts()
+print(value_counts)
+print(type(value_counts))
+# 3    491
+# 1    216
+# 2    184
+# Name: Pclass, dtype: int64
+# <class 'pandas.core.series.Series'>
+
+new_value_counts = value_counts.reset_index(inplace=False)
+print(new_value_counts)
+print(type(new_value_counts))
+#    index  Pclass
+# 0      3     491
+# 1      1     216
+# 2      2     184
+# <class 'pandas.core.frame.DataFrame'>
+
+## select / filter data
+titanic_df = pd.read_csv('titanic/train.csv')
+print(titanic_df['Pclass'].head(3)) # column 
+print(titanic_df[['Survived', 'Pclass']].head(3)) # columns
+print(titanic_df[ titanic_df['Pclass'] == 3 ].head(3)) # boolean indexing
+
+dic_temp = {'Name': ['Park', 'Lee', 'Kim', 'Choi'],
+           'Year': [2012, 2015, 2020, 2021],
+           'Gender': ['Male', 'Female', 'Male', 'Female']}
+data_df = pd.DataFrame(dic_temp, index=['one', 'two', 'three', 'four'])
+
+data_df_reset = data_df.reset_index()
+data_df_reset = data_df_reset.rename(columns={'index':'old_index'}) # rename column
+data_df_reset.index = data_df_reset.index+1
+print(data_df_reset)
+#   old_index  Name  Year  Gender
+# 1       one  Park  2012    Male
+# 2       two   Lee  2015  Female
+# 3     three   Kim  2020    Male
+# 4      four  Choi  2021  Female
+
+## iloc - index location
+print(data_df.iloc[0,0]) # Park
+print(data_df_reset.iloc[0,1]) # Park
+
+## loc - name location
+print(data_df.loc['one', 'Name']) # Park
+print(data_df_reset.loc[1, 'Name']) # Park
+
+print(data_df.iloc[0:1, 0]) # index location - exclude 1
+# one    Park
+# Name: Name, dtype: object
+
+print(data_df.loc['one':'two', 'Name'])
+# one    Park
+# two     Lee
+# Name: Name, dtype: object
+
+print(data_df_reset.loc[1:2, 'Name']) # name location - include 2 as well
+# 1    Park
+# 2     Lee
+# Name: Name, dtype: object
+
+## boolean indexing
+titanic_bool = titanic_df[ titanic_df['Age'] > 60 ]
+print(type(titanic_bool))
+print(titanic_bool)
+
+## below three have same the same result
+print(titanic_df[ titanic_df['Age'] > 60 ][['Name', 'Age']].head(3))
+print(titanic_df[['Name', 'Age']][ titanic_df['Age'] > 60 ].head(3))
+print(titanic_df.loc[titanic_df['Age'] > 60, ['Name', 'Age']].head(3))
+#                               Name   Age
+# 33           Wheadon, Mr. Edward H  66.0
+# 54  Ostby, Mr. Engelhart Cornelius  65.0
+# 96       Goldschmidt, Mr. George B  71.0
+
+titanic_df[ (titanic_df['Age'] < 30 ) & (titanic_df['Pclass']==1) & (titanic_df['Sex']=='female') ].head(3)
+
+cond1 = titanic_df['Age'] < 30
+cond2 = titanic_df['Pclass']==1
+cond3 = titanic_df['Sex']=='female'
+titanic_df[cond1 & cond2 & cond3].head(3)
+
+## aggregation
+print(titanic_df.count()) # NaN excluded
+print(titanic_df[['Age', 'Fare']].mean(axis=1)) # column direction
+print(titanic_df[['Age', 'Fare']].sum(axis=0)) # row direction
+# Age     21205.1700
+# Fare    28693.9493
+
+## groupby
+titanic_groupby = titanic_df.groupby('Pclass').count()
+print(titanic_groupby)
+print(titanic_groupby.shape) # (3, 11)
+print(titanic_groupby.index) # Int64Index([1, 2, 3], dtype='int64', name='Pclass')
+
+titanic_groupby1 = titanic_df.groupby(by='Pclass')[['PassengerId', 'Survived']].count()
+titanic_groupby2 = titanic_df[['Pclass', 'PassengerId', 'Survived']].groupby('Pclass').count()
+print(titanic_groupby1) # same result
+print(titanic_groupby2) # same result
+
+## agg
+print(titanic_df.groupby('Pclass')['Age'].agg([max,min]))
+#          max   min
+# Pclass            
+# 1       80.0  0.92
+# 2       70.0  0.67
+# 3       74.0  0.42
+
+agg_format = {'Age':'max', 'SibSp':'sum', 'Fare':'mean'}
+print(titanic_df.groupby('Pclass').agg(agg_format))
+#          Age  SibSp       Fare
+# Pclass                        
+# 1       80.0     90  84.154687
+# 2       70.0     74  20.662183
+# 3       74.0    302  13.675550
+
+## missing data - isna(), fillna()
+print(titanic_df.isna().head(3))
+print(titanic_df.isna().sum())
+
+titanic_df['Cabin'] = titanic_df['Cabin'].fillna('C000')
+titanic_df['Age'] = titanic_df['Age'].fillna(titanic_df['Age'].mean())
+titanic_df['Embarked'] = titanic_df['Embarked'].fillna('S')
+print(titanic_df.head(3))
+print(titanic_df.isna().sum())
+
+## apply lambda
+titanic_df['Name_len'] = titanic_df['Name'].apply(lambda x : len(x))
+print(titanic_df[['Name', 'Name_len']].head(3))
+
+titanic_df['Child_Adult'] = titanic_df['Age'].apply(lambda x : 'Child' if x <= 18 else 'Adult')
+print(titanic_df[['Age','Child_Adult']].head(3))
+
+titanic_df['Age_cat'] = titanic_df['Age'].apply(lambda x : 'Child' if x <= 15 else ('Adult' if x <=60 else 'Elderly'))
+print(titanic_df[['Age','Age_cat']].head(3))
+print(titanic_df['Age_cat'].value_counts())
+# Adult      786
+# Child       83
+# Elderly     22
+
+def get_category(age):
+    cat = ''
+    if age <= 5: cat = 'baby'
+    elif age <= 12: cat = 'child'
+    elif age <= 18: cat = 'teenager'
+    elif age <= 40: cat = 'youth'
+    elif age <= 60: cat = 'middle-aged'
+    else: cat = 'elderly'
+        
+    return cat
+
+titanic_df['Age_cat'] = titanic_df['Age'].apply(lambda x : get_category(x))
+print(titanic_df[['Age', 'Age_cat']].head(10))
