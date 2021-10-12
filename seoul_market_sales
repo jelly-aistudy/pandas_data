@@ -1,0 +1,196 @@
+import pandas as pd
+sales = pd.read_csv('00_data/Seoul_area_sales.csv', encoding='utf-8-sig')
+sales.head() # 5 rows × 80 columns
+
+sales.shape # (132321, 80)
+sales.info()
+sales.describe()
+sales.isnull().sum()
+sales['상권_코드'].value_counts().max() # 225
+sales['상권_코드_명'].value_counts().max() # 225
+sales['상권_구분_코드'].value_counts().max() # 84892
+sales['상권_구분_코드_명'].value_counts().max() # 84892
+sales['서비스_업종_코드'].value_counts().max() # 5756
+sales['서비스_업종_코드_명'].value_counts().max() # 5756
+
+sales['상권_코드'].nunique() # 1486
+sales['상권_코드_명'].unique() # array(['역촌중앙시장', '신수시장', '창신2길', ..., '잠실 관광특구', '강남 마이스 관광특구', '남평화시장'], dtype=object)
+sales['상권_구분_코드'].nunique() # 4
+sales['상권_구분_코드_명'].unique() # array(['전통시장', '골목상권', '관광특구', '발달상권'], dtype=object)
+sales['서비스_업종_코드'].nunique() # 63 
+sales['서비스_업종_코드_명'].unique() # array(['청과상', '일반교습학원', '호프-간이주점', '한식음식점', '당구장', '화장품', '중식음식점', ...
+
+### sales per market and quarter ### 
+sales_quarter = sales[['기준_분기_코드','상권_구분_코드_명', '상권_코드_명', '서비스_업종_코드_명', '분기당_매출_금액', '분기당_매출_건수']]
+sales_quarter.head()
+
+sales_quarter_market_type = sales_quarter.groupby(['기준_분기_코드','상권_구분_코드_명']).sum()
+pd.options.display.float_format = '{:,.0f}'.format
+sales_quarter_market_type = sales_quarter_market_type.reset_index() # allocation necessary
+sales_quarter_market_type.rename(columns = {'기준_분기_코드' : 'quarter', '상권_구분_코드_명': 'market_type', '분기당_매출_금액': 'quarterly_sales_amount', '분기당_매출_건수': 'quarterly_sales_number'}, inplace = True)
+
+import chart_studio.plotly as py
+import cufflinks as cf
+cf.go_offline(connected=True)
+
+### heatmap
+layout = {
+    'title':  {
+            "text": "<b>분기/상권별 매출금액 히트맵</b>",
+            "x": 0.5,
+            "y": 0.9,
+            "font": {
+                "size": 16
+            }
+    },
+    'xaxis': {
+        'title': '<b>상권</b>'
+    },
+    "yaxis": {
+        "title": "<b>분기</b>",
+        "dtick": 1
+    },
+    "template":'plotly_white'
+}
+sales_quarter_market_type.iplot(kind='heatmap', y='quarter', x='market_type', z='quarterly_sales_amount', colorscale='Reds', layout=layout)
+
+sales_quarter_market_type = sales_quarter_market_type.groupby(['quarter','market_type']).sum()
+sales_quarter_market_type = sales_quarter_market_type.reset_index()
+# sales_quarter_market_type.set_index('quarter', inplace=True)
+
+### bar graph
+# https://plotly.com/python/bar-charts/
+# https://hogni.tistory.com/86
+import plotly.graph_objects as go
+
+fig = go.Figure()
+
+fig.add_trace(
+    go.Bar(
+        x=sales_quarter_market_type[sales_quarter_market_type['market_type'] == '골목상권'].quarter,
+        y=sales_quarter_market_type[sales_quarter_market_type['market_type'] == '골목상권'].quarterly_sales_amount, 
+        text=sales_quarter_market_type[sales_quarter_market_type['market_type'] == '골목상권'].quarterly_sales_amount, 
+        textposition='auto', 
+        texttemplate='%{text:,.0f} won',
+        name='골목상권'
+    )
+)
+fig.add_trace(
+    go.Bar(
+        x=sales_quarter_market_type[sales_quarter_market_type['market_type'] == '관광특구'].quarter,
+        y=sales_quarter_market_type[sales_quarter_market_type['market_type'] == '관광특구'].quarterly_sales_amount, 
+        text=sales_quarter_market_type[sales_quarter_market_type['market_type'] == '관광특구'].quarterly_sales_amount, 
+        textposition='auto', 
+        texttemplate='%{text:,.0f} won',
+        name='관광특구'
+    )
+)
+fig.add_trace(
+    go.Bar(
+        x=sales_quarter_market_type[sales_quarter_market_type['market_type'] == '발달상권'].quarter,
+        y=sales_quarter_market_type[sales_quarter_market_type['market_type'] == '발달상권'].quarterly_sales_amount, 
+        text=sales_quarter_market_type[sales_quarter_market_type['market_type'] == '발달상권'].quarterly_sales_amount, 
+        textposition='auto', 
+        texttemplate='%{text:,.0f} won',
+        name='발달상권'
+    )
+)
+fig.add_trace(
+    go.Bar(
+        x=sales_quarter_market_type[sales_quarter_market_type['market_type'] == '전통시장'].quarter,
+        y=sales_quarter_market_type[sales_quarter_market_type['market_type'] == '전통시장'].quarterly_sales_amount, 
+        text=sales_quarter_market_type[sales_quarter_market_type['market_type'] == '전통시장'].quarterly_sales_amount, 
+        textposition='auto', 
+        texttemplate='%{text:,.0f} won',
+        name='전통시장'
+    )
+)
+
+fig.update_layout(
+    {
+        "title": {
+            "text": "<b>분기 / 상권 별 매출금액</b>",
+            "x": 0.5,
+            "y": 0.9,
+            "font": {
+                "size": 15
+            }
+        },
+        "xaxis": {
+            "title": "분기/상권",
+            "tickfont": {
+                "size": 7                
+            }
+        },
+        "yaxis": {
+            "title": "매출금액",
+            "tickfont": {
+                "size": 10                
+            }
+        },
+        "template":'plotly_white'
+    }
+)
+
+fig.show()
+
+### sales per market and service type ###
+sales_quarter_service_type = sales_quarter.groupby(['상권_구분_코드_명', '서비스_업종_코드_명']).sum().sort_values(by=['상권_구분_코드_명','서비스_업종_코드_명'], ascending=False)
+pd.options.display.float_format = '{:,.0f}'.format
+sales_quarter_service_type.reset_index(inplace=True) # inplace necessary
+sales_quarter_service_type.columns # Index(['상권_구분_코드_명', '서비스_업종_코드_명', '기준_분기_코드', '분기당_매출_금액', '분기당_매출_건수'], dtype='object')
+sales_quarter_service_type.index # RangeIndex(start=0, stop=251, step=1)
+
+# traditional market
+sales_quarter_service_type[sales_quarter_service_type['상권_구분_코드_명'] == '전통시장'].sort_values('분기당_매출_금액',ascending=False)
+# local business
+sales_quarter_service_type[sales_quarter_service_type['상권_구분_코드_명'] == '골목상권'].sort_values('분기당_매출_금액',ascending=False)
+# developed shopping district
+sales_quarter_service_type[sales_quarter_service_type['상권_구분_코드_명'] == '발달상권'].sort_values('분기당_매출_금액',ascending=False)
+# special tourist zone
+sales_quarter_service_type[sales_quarter_service_type['상권_구분_코드_명'] == '관광특구'].sort_values('분기당_매출_금액',ascending=False)
+
+### sales per day ###
+sales_service = sales[['기준_분기_코드','상권_구분_코드_명', '상권_코드_명', 
+                  '서비스_업종_코드_명', '월요일_매출_금액', '화요일_매출_금액',
+                  '수요일_매출_금액', '목요일_매출_금액', '금요일_매출_금액',
+                  '토요일_매출_금액','일요일_매출_금액','월요일_매출_건수', '화요일_매출_건수',
+                  '수요일_매출_건수', '목요일_매출_건수', '금요일_매출_건수',
+                  '토요일_매출_건수','일요일_매출_건수']]
+sales_service_days = sales_service.groupby('서비스_업종_코드_명').sum().sort_values(by='서비스_업종_코드_명', ascending=False)
+pd.options.display.float_format = '{:,.0f}'.format
+sales_service_days.info()
+sales_service_days.index
+
+sales_service_mon = sales_service_days['월요일_매출_금액']
+sales_service_tue = sales_service_days['화요일_매출_금액']
+sales_service_wed = sales_service_days['수요일_매출_금액']
+sales_service_thu = sales_service_days['목요일_매출_금액']
+sales_service_fri = sales_service_days['금요일_매출_금액']
+sales_service_sat = sales_service_days['토요일_매출_금액']
+sales_service_sun = sales_service_days['일요일_매출_금액']
+
+### pie graph
+import plotly.graph_objects as go
+
+fig = go.Figure()
+fig.add_trace(
+    go.Pie(    
+        labels=sales_service_mon.index, values=sales_service_mon.values,
+        textinfo='label+percent', insidetextorientation='auto'
+    )
+)
+
+fig.update_layout(
+    {
+        "title": {
+            "text": "Sales on Mondays",
+            "font": {
+                "size": 15
+            }
+        },
+        "showlegend": True
+    }
+)
+
+fig.show()
